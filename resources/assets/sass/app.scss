@@ -1,0 +1,155 @@
+@import "normalize";
+@import "settings";
+@import "foundation";
+
+@include foundation-everything;
+
+.social-icon{
+  margin-top:15px;
+}
+.icon-button {
+  border-radius: 3.0rem;
+  width: 3.0rem;
+  height: 3.0rem;
+  margin: 0 5px;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  font-size: 2rem;
+  background: white;
+  span {
+    display: block;
+    border-radius: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transition: all 0.3s;
+  }
+  &:hover span {
+    display: block;
+    border-radius: 3.0rem;
+    width: 3.0rem;
+    height: 3.0rem;
+    margin: -1.5rem;
+  }
+  i {
+    background: none;
+    height: 3.0rem;
+    width: 3.0rem;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    line-height: 3.0rem;
+    transition: all 0.3s;
+  }
+}
+
+.github span {
+  background-color: #4099ff;
+}
+
+.search span {
+  background-color: #3B5998;
+}
+
+.rss span {
+  background-color: #db5a3c;
+}
+
+.icon-button .fi-social-github {
+  color: #4099ff;
+}
+
+.icon-button .fi-page-search {
+  color: #3b5998;
+}
+
+.icon-button .fi-rss {
+  color: #db5a3c;
+}
+
+.icon-button:hover .fi-social-github, .icon-button:hover .fi-page-search, .icon-button:hover .fi-rss {
+  color: white;
+  font-size: 2.4rem;
+  line-height: 3.4rem;
+}
+
+.main-page {
+  padding: 0 30px 0 30px;
+}
+
+.post-list .post {
+  margin-top: 10px;
+  border-bottom: 1px solid rgb(202, 202, 202);
+
+  .entry-content p{
+    line-height: 1.6em;
+    height: 4.8em;
+    overflow: hidden;
+  }
+}
+
+article{
+  .title {
+    font-size: 30px;
+    a {
+      color: #333;
+    }
+    a:hover{
+      color: $primary-color;
+    }
+  }
+
+  .meta{
+    font-size:15px;
+    color: #333;
+    a{
+      color:#333;
+    }
+  }
+
+  .more-link{
+    font-size: 15px;
+  }
+
+}
+
+
+
+.position-left {
+  height: 100%;
+  background-image:-webkit-linear-gradient(to right bottom, #1d4d60,#142d4a);
+  background-image:linear-gradient(to right bottom, #1d4d60,#142d4a);
+}
+
+.profile {
+  padding-left: 20px;
+  padding-top:10px;
+  .profile-pic {
+    background-image: url("/images/octobiwan.jpg");
+    background-size: 160px 160px;
+    border-radius: 50%;
+    display: block;
+    height: 160px;
+    margin: 0 0 20px 0;
+    width: 160px;
+  }
+
+  .profile-name{
+   color:white;
+  }
+
+}
+
+.left-nav{
+  margin-left:4px;
+}
+.pagination{
+  margin-top:10px;
+}
+
+
+
