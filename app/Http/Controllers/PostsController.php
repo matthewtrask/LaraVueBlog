@@ -3,17 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use App\Transformers\PostTransformer;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Input;
 
-class PostsController extends Controller
+class PostsController extends ApiController
 {
+    protected $postTransformer;
 
-    public function __construct()
+    public function __construct(PostTransformer $postTransformer)
     {
 //        $this->middleware('auth', ['except' => ['show', 'index']]);
+        $this->postTransformer = $postTransformer;
+
     }
 
     /**
@@ -24,9 +28,20 @@ class PostsController extends Controller
     public function index()
     {
         //
-        $posts = Post::latest('published_at')->get();
-        return $posts;
-        return response($posts, 200);
+        $limit = Input::get('limit') ?: 5;
+        $posts = Post::latest('published_at')->paginate($limit);
+//        dd(get_class_methods($posts));
+        return $this->respond([
+            'data' => $this->postTransformer->transformCollection($posts->all()),
+            'paginator' => [
+                'total_count' => $posts->total(),
+                'current_page' => $posts->currentPage(),
+                'total_pages' => ceil( $posts->total()/$posts->perPage() ),
+                'limit'=>$posts->perPage()
+            ]
+
+
+        ]);
     }
 
 
@@ -51,7 +66,13 @@ class PostsController extends Controller
     {
         //
         $post = Post::find($id);
-        return response($post, 200);
+        if ($post) {
+            return $this->respond([
+                'data' => $this->postTransformer->transform($post)
+            ]);
+        } else {
+            return $this->respondNotFound('Post does not found!');
+        }
     }
 
 

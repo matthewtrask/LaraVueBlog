@@ -12585,17 +12585,18 @@ exports.default = {
             post: ''
         };
     },
-    created: function created() {
-        var vm = this;
-        $.getJSON('api/posts/' + vm.$route.params.postId, function (data) {
-            vm.post = data;
-            console.log(vm.$route.params);
-        });
+    methods: {
+        fetchPost: function fetchPost() {
+            var vm = this;
+            $.getJSON('api/posts/' + vm.$route.params.postId, function (respond) {
+                vm.post = respond['data'];
+            });
+        }
     }
 
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<article class=\"post\">\n    <h1 class=\"title\">{{ post.title }}</h1>\n    <div class=\"meta\">\n        <span class=\"date\">发布时间：<time>{{ post.published_at }}</time></span>\n    </div>\n    <div class=\"entry-content\">\n        <p>{{ post.content }}</p>\n    </div>\n</article>\n<section class=\"comments\">\n    <!--To Do, comment section-->\n</section>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<article class=\"post\">\n    <h1 class=\"title\">{{ post.title }}</h1>\n\n    <div class=\"entry-content\">\n        <p>{{ post.content }}</p>\n    </div>\n    <div class=\"meta\">\n        <span class=\"date\">发布于<time>{{ }}</time>，最后修改于<time>{{(new Date(post.updated_at.date)).toDateString()}}\n        </time></span>\n    </div>\n</article>\n<section class=\"comments\">\n    <!--To Do, comment section-->\n</section>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -12619,21 +12620,47 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.default = {
+    route: {
+        data: function data(transition) {
+            console.log("hello");
+            transition.next();
+        }
+    },
     data: function data() {
         return {
-            posts: []
+            posts: [],
+            paginator: []
         };
     },
-    created: function created() {
-        var vm = this;
-        $.getJSON('api/posts', function (data) {
-            vm.posts = data;
-        });
-    }
 
+    computed: {
+        prev_page_id: function prev_page_id() {
+            if (this.paginator.current_page > 1) {
+                return this.paginator.current_page - 1;
+            } else {
+                return null;
+            }
+        },
+        next_page_id: function next_page_id() {
+            if (this.paginator.current_page < this.paginator.total_pages) {
+                return this.paginator.current_page + 1;
+            } else {
+                return null;
+            }
+        }
+    },
+    methods: {
+        fetchPosts: function fetchPosts() {
+            var vm = this;
+            $.getJSON('api/posts?limit=3&page=' + vm.$route.query.pn, function (respond) {
+                vm.posts = respond['data'];
+                vm.paginator = respond['paginator'];
+            });
+        }
+    }
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"post-list\">\n    <article class=\"post\" v-for=\"post in posts\">\n        <h1 class=\"title\"><a v-link=\"{  path:'/posts/'  + post.id  }\">{{ post.title }}</a></h1>\n        <div class=\"entry-content\">\n            <p>{{ post.content }}</p>\n        </div>\n        <div class=\"meta\">\n            <span class=\"date\">发布时间：<time>{{ post.published_at }}</time></span>\n            <span class=\"comment\">评论：<a href=\"#\">20</a></span>\n        </div>\n        <p><a v-link=\"{  path:'/posts/'  + post.id  }\" class=\"more-link\">继续阅读 »</a></p>\n    </article>\n    <ul class=\"pagination text-center\" role=\"navigation\" aria-label=\"Pagination\">\n        <li class=\"pagination-previous disabled\">Previous</li>\n        <li class=\"current\"><span class=\"show-for-sr\">You're on page</span> 1</li>\n        <li><a href=\"#\" aria-label=\"Page 2\">2</a></li>\n        <li><a href=\"#\" aria-label=\"Page 3\">3</a></li>\n        <li class=\"ellipsis\"></li>\n        <li><a href=\"#\" aria-label=\"Page 6\">6</a></li>\n        <li><a href=\"#\" aria-label=\"Page 7\">7</a></li>\n        <li class=\"pagination-next\"><a href=\"#\" aria-label=\"Next page\">Next</a></li>\n    </ul>\n</div>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"post-list\">\n    <article class=\"post\" v-for=\"post in posts\">\n        <h1 class=\"title\"><a v-link=\"{  path:'/posts/'  + post.id  }\">{{ post.title }}</a></h1>\n        <div class=\"entry-content\">\n            <p>{{ post.content }}</p>\n        </div>\n        <div class=\"meta\">\n            <span class=\"date\">发布时间：<time>{{ (new Date(post.published_at.date)).toDateString() }}</time></span>\n            <span class=\"comment\">评论：<a href=\"#\">20</a></span>\n        </div>\n        <p><a v-link=\"{  path:'/posts/'  + post.id  }\" class=\"more-link\" aria-label=\"Next page\">继续阅读</a></p>\n    </article>\n    <ul class=\"pagination text-center\" role=\"navigation\" aria-label=\"Pagination\" v-show=\"posts\">\n        <li class=\"pagination-previous\" v-show=\"prev_page_id\">\n            <a v-link=\"{path:'/posts?pn=' + prev_page_id}\" aria-label=\"Previous page\">Previous</a>\n        </li>\n        <li class=\"pagination-next\" v-show=\"next_page_id\">\n            <a v-link=\"{path:'/posts?pn=' + next_page_id}\" aria-label=\"Next page\">Next</a>\n        </li>\n    </ul>\n</div>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -12667,19 +12694,23 @@ var VueRouter = require('vue-router');
 
 Vue.use(VueRouter);
 
-var Foo = Vue.extend({
-    template: '<p>This is foo!</p>'
-});
-
-var Bar = Vue.extend({
-    template: '<p>This is bar!</p>'
-});
-
 var Blog = Vue.extend({
+    route: {
+        data: function data(transition) {
+            this.$children[0].fetchPosts();
+            transition.next();
+        }
+    },
     components: { PostList: _Posts2.default },
     template: '<post-list></post-list>'
 });
 var Post = Vue.extend({
+    route: {
+        data: function data(transition) {
+            this.$children[0].fetchPost();
+            transition.next();
+        }
+    },
     components: { BlogPost: _Post2.default },
     template: '<blog-post ></blog-post>'
 });
@@ -12692,9 +12723,6 @@ router.map({
     '/posts/:postId': {
         name: 'post',
         component: Post
-    },
-    '/bar': {
-        component: Bar
     }
 });
 

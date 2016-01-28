@@ -1,25 +1,30 @@
-import PostList from './components/Posts.vue';
-import BlogPost from './components/Post.vue';
 
 var Vue = require('vue');
 var VueRouter = require('vue-router');
 
 Vue.use(VueRouter);
 
-var Foo = Vue.extend({
-    template: '<p>This is foo!</p>'
-});
-
-var Bar = Vue.extend({
-    template: '<p>This is bar!</p>'
-});
+import PostList from './components/Posts.vue';
+import BlogPost from './components/Post.vue';
 
 
 var Blog = Vue.extend({
+    route: {
+        data: function (transition) {
+            this.$children[0].fetchPosts();
+            transition.next()
+        }
+    },
     components: {PostList: PostList},
     template: '<post-list></post-list>'
 });
 var Post = Vue.extend({
+    route: {
+        data: function (transition) {
+            this.$children[0].fetchPost();
+            transition.next()
+        }
+    },
     components: {BlogPost: BlogPost},
     template: '<blog-post ></blog-post>'
 });
@@ -32,9 +37,6 @@ router.map({
     '/posts/:postId': {
         name: 'post',
         component: Post
-    },
-    '/bar': {
-        component: Bar
     }
 });
 

@@ -19,7 +19,7 @@
             <li><a href="#">关于</a></li>
         </ul>
         <div class="social-icon">
-            <a href="#" class="icon-button github">
+            <a href="https://github.com/lyz1990" class="icon-button github">
                 <i class="fi-social-github"></i><span></span>
             </a>
             <a href="#" class="icon-button search">
