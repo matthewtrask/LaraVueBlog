@@ -12572,14 +12572,21 @@ exports.insert = function (css) {
 }
 
 },{}],6:[function(require,module,exports){
-var __vueify_style__ = require("vueify-insert-css").insert("\n\n")
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.default = {
-
+    route: {
+        active: function active() {},
+        data: function data(transition) {
+            this.fetchPost();
+            this.prepare_disqus();
+            this.reset_disqus(this.post.id, this.post.title);
+            transition.next();
+        }
+    },
     data: function data() {
         return {
             post: ''
@@ -12591,28 +12598,54 @@ exports.default = {
             $.getJSON('api/posts/' + vm.$route.params.postId, function (respond) {
                 vm.post = respond['data'];
             });
+        },
+        prepare_disqus: function prepare_disqus() {
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'lyz1990';
+            var disqus_identifier = this.post.id;
+            var disqus_url = 'http://lyz1990.com/#!/posts/' + disqus_identifier;
+            var disqus_config = function disqus_config() {
+                this.language = "en";
+            };
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        },
+        reset_disqus: function reset_disqus(post_id, post_title) {
+            if (typeof DISQUS != "undefined") {
+                DISQUS.reset({
+                    reload: true,
+                    config: function config() {
+                        this.page.identifier = post_id;
+                        this.page.url = 'http://www.lyz1990.com/#!/posts/' + post_id;
+                        this.page.title = post_title;
+                        this.language = 'en';
+                    }
+                });
+            }
         }
     }
 
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<article class=\"post\">\n    <h1 class=\"title\">{{ post.title }}</h1>\n\n    <div class=\"entry-content\">\n        <p>{{ post.content }}</p>\n    </div>\n    <div class=\"meta\">\n        <span class=\"date\">发布于<time>{{ }}</time>，最后修改于<time>{{(new Date(post.updated_at.date)).toDateString()}}\n        </time></span>\n    </div>\n</article>\n<section class=\"comments\">\n    <!--To Do, comment section-->\n</section>\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<article class=\"post\">\n    <h1 class=\"title\">{{ post.title }}</h1>\n\n    <div class=\"entry-content\">\n        <p>{{ post.content }}</p>\n    </div>\n    <div class=\"meta\">\n        <span class=\"date\">发布于<time>{{(new Date(post.published_at.date)).toDateString()}}</time>，\n            最后修改于<time>{{(new Date(post.updated_at.date)).toDateString()}}\n            </time></span>\n    </div>\n</article>\n<div>\n    <li class=\"pagination-previous\">\n        <a v-link=\"{path:'/posts/' + (post.id - 1)}\" aria-label=\"Previous page\">Previous</a>\n    </li>\n    <li class=\"pagination-next\">\n        <a v-link=\"{path:'/posts/' + (post.id+1)}\" aria-label=\"Next page\">Next</a>\n    </li>\n</div>\n<section class=\"comments\">\n    <div id=\"disqus_thread\"></div>\n</section>\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
   if (!hotAPI.compatible) return
   var id = "/home/lyz1990/Projects/Z/resources/assets/js/components/Post.vue"
-  module.hot.dispose(function () {
-    require("vueify-insert-css").cache["\n\n"] = false
-    document.head.removeChild(__vueify_style__)
-  })
   if (!module.hot.data) {
     hotAPI.createRecord(id, module.exports)
   } else {
     hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"vue":4,"vue-hot-reload-api":2,"vueify-insert-css":5}],7:[function(require,module,exports){
+},{"vue":4,"vue-hot-reload-api":2}],7:[function(require,module,exports){
 var __vueify_style__ = require("vueify-insert-css").insert("\n\n")
 'use strict';
 
@@ -12622,7 +12655,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = {
     route: {
         data: function data(transition) {
-            console.log("hello");
+            this.fetchPosts();
             transition.next();
         }
     },
@@ -12632,7 +12665,6 @@ exports.default = {
             paginator: []
         };
     },
-
     computed: {
         prev_page_id: function prev_page_id() {
             if (this.paginator.current_page > 1) {
@@ -12679,50 +12711,18 @@ if (module.hot) {(function () {  module.hot.accept()
 },{"vue":4,"vue-hot-reload-api":2,"vueify-insert-css":5}],8:[function(require,module,exports){
 'use strict';
 
-var _Posts = require('./components/Posts.vue');
-
-var _Posts2 = _interopRequireDefault(_Posts);
-
-var _Post = require('./components/Post.vue');
-
-var _Post2 = _interopRequireDefault(_Post);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 var Vue = require('vue');
 var VueRouter = require('vue-router');
 
 Vue.use(VueRouter);
 
-var Blog = Vue.extend({
-    route: {
-        data: function data(transition) {
-            this.$children[0].fetchPosts();
-            transition.next();
-        }
-    },
-    components: { PostList: _Posts2.default },
-    template: '<post-list></post-list>'
-});
-var Post = Vue.extend({
-    route: {
-        data: function data(transition) {
-            this.$children[0].fetchPost();
-            transition.next();
-        }
-    },
-    components: { BlogPost: _Post2.default },
-    template: '<blog-post ></blog-post>'
-});
-
 var router = new VueRouter();
 router.map({
     '/posts': {
-        component: Blog
+        component: require('./components/Posts.vue')
     },
     '/posts/:postId': {
-        name: 'post',
-        component: Post
+        component: require('./components/Post.vue')
     }
 });
 

@@ -32,7 +32,7 @@
     export default{
         route: {
             data: function (transition) {
-                console.log("hello");
+                this.fetchPosts();
                 transition.next()
             }
         },
@@ -42,7 +42,6 @@
                 paginator: []
             }
         },
-
         computed: {
             prev_page_id: function () {
                 if (this.paginator.current_page > 1) {
